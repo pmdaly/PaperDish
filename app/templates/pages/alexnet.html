@@ -1,0 +1,38 @@
+{% extends  'layouts/default.html' %}
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class='page-inner'>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class='card-header'>
+          <div class='card-title'>Original</div>
+        </div>
+        <div class='card-body'>
+          <div class='d-flex justify-content-center p-3'>
+            <img src="/static/images/orig.png" alt="orig" style="width:100%">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class='card-header'>
+          <div class='card-title'>{{ pred }}</div>
+        </div>
+        <div class='card-body'>
+          <div class='d-flex justify-content-center p-3'>
+            <img src="/static/images/orig.png" alt="new" style="width:100%">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
