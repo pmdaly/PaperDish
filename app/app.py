@@ -1,12 +1,12 @@
 import os
 import torch
-from flask import Flask, flash, render_template, redirect, request, url_for
+from models import AlexNet, topk_to_rank_string
+from flask import Flask, flash, render_template, redirect, request, url_for , Markup
 from PIL import Image
-from torchvision import transforms
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = './static/images/'
-ALLOWED_EXTENSIONS = {'jpq', 'jpeg', 'png'}
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -41,21 +41,15 @@ def index():
 def alexnet():
     if not valid_request(request): return redirect(request.url)
     # hard coded image as orig.png
-    model = torch.hub.load('pytorch/vision:v0.6.0', 'alexnet', pretrained=True)
+    model = AlexNet(pretrained=True)
     model.eval()
-    transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(227),
-        transforms.ToTensor()
-        ])
+
     image = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], 'orig.png'))
-    image_tensor = transform(image)
-    import ipdb; ipdb.set_trace()
-    image_batch = image_tensor.unsqueeze(0)
-    with torch.no_grad():
-        output = model(image_batch)
-    pred = torch.nn.functional.softmax(output[0], dim=0)
-    return render_template('/pages/alexnet.html', pred=pred)
+    image = image.convert('RGB')
+
+    out = topk_to_rank_string(*model(image))
+
+    return render_template('/pages/alexnet.html', out=Markup(out[:-2]))
 
 @app.route('/fcn', methods=['POST'])
 def fcn():
@@ -76,4 +70,4 @@ def image_get():
     return render_template('/pages/image_form.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=1212)
+    app.run(debug=True, port=2222)
